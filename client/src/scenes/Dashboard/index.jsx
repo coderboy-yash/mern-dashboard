@@ -19,7 +19,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import BreakdownChart from "../../components/BreakdownChart";
 import OverviewChart from "../../components/OverviewChart";
 import { useGetDashboardQuery } from "../../state/api";
-import StatBox from "../../components/StatBox";
+import Statbox from "../../components/Statbox";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -89,7 +89,7 @@ const Dashboard = () => {
         }}
       >
         {/* ROW 1 */}
-        <StatBox
+        <Statbox
           title="Total Customers"
           value={data && data.totalCustomers}
           increase="+14%"
@@ -100,7 +100,7 @@ const Dashboard = () => {
             />
           }
         />
-        <StatBox
+        <Statbox
           title="Sales Today"
           value={data && data.todayStats.totalSales}
           increase="+21%"
@@ -120,7 +120,7 @@ const Dashboard = () => {
         >
           <OverviewChart view="sales" isDashboard={true} />
         </Box>
-        <StatBox
+        <Statbox
           title="Monthly Sales"
           value={data && data.thisMonthStats.totalSales}
           increase="+5%"
@@ -131,7 +131,7 @@ const Dashboard = () => {
             />
           }
         />
-        <StatBox
+        <Statbox
           title="Yearly Sales"
           value={data && data.yearlySalesTotal}
           increase="+43%"
