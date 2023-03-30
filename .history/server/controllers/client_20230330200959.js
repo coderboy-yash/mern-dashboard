@@ -6,20 +6,35 @@ import getCountryIso3 from "country-iso-2-to-3";
 
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find();
-    // console.log("products", products);
-    const productsWithStats = await Promise.all(
-      products.map(async (product) => {
-        const stat = await ProductStat.find({
-          productid: product._id,
-        });
+    const [products, stats] = await Promise.all([
+      Product.find(),
+      ProductStat.find(),
+    ]);
+    // const len = await Product.count();
+    // console.log("products", len);
 
-        return {
-          ...product._doc,
-          stat,
-        };
-      })
-    );
+    let data = {};
+    products.forEach((product) => {
+      data[product._id] = [product];
+    });
+    stats.forEach((stat) => {
+      if (data[stat.productId]) data[stat.productId].push(stat);
+    });
+
+    const ids = data.map((x) => x._id);
+
+    // const productsWithStats = await Promise.all(
+    //   products.map(async (product) => {
+    //     const stat = await ProductStat.find({
+    //       productId: product._id,
+    //     });
+
+    return {
+      ...product._doc,
+      stat,
+    };
+    // })
+    // );
     res.status(200).json(productsWithStats);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -29,7 +44,7 @@ export const getProducts = async (req, res) => {
 export const getCustomers = async (req, res) => {
   try {
     const customers = await User.find({ role: "user" }).select("-password");
-    console.log(customers);
+    // console.log(customers);
     res.status(200).json(customers);
   } catch (error) {
     res.status(404).json({ message: error.message });

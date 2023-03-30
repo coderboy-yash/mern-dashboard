@@ -6,21 +6,32 @@ import getCountryIso3 from "country-iso-2-to-3";
 
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find();
-    // console.log("products", products);
-    const productsWithStats = await Promise.all(
-      products.map(async (product) => {
-        const stat = await ProductStat.find({
-          productid: product._id,
-        });
+    const [products, stats] = await Promise.all([
+      Product.find(),
+      ProductStat.find(),
+    ]);
 
-        return {
-          ...product._doc,
-          stat,
-        };
-      })
-    );
-    res.status(200).json(productsWithStats);
+    let data = {};
+    products.forEach((product) => {
+      console.log(product._id);
+      data[product._id.toString()] = [product];
+    });
+
+    stats.forEach((stat) => {
+      console.log(stat);
+      if (data[stat.productid]) data[stat.productid].push(stat);
+    });
+
+    let result = [];
+    for (let idx in data) {
+      if (!data[idx][1]) console.log("undefined");
+      result.push({
+        ...data[idx][0]._doc,
+        stat: data[idx][1],
+      });
+    }
+
+    res.status(200).json(result);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
@@ -29,7 +40,7 @@ export const getProducts = async (req, res) => {
 export const getCustomers = async (req, res) => {
   try {
     const customers = await User.find({ role: "user" }).select("-password");
-    console.log(customers);
+    // console.log(customers);
     res.status(200).json(customers);
   } catch (error) {
     res.status(404).json({ message: error.message });
